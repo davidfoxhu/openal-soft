@@ -18,7 +18,7 @@
  * Or go to http://www.gnu.org/copyleft/lgpl.html
  */
 
-#include "config.h"
+#include "openal_config.h"
 
 #include <math.h>
 #include <stdlib.h>
@@ -41,9 +41,9 @@
 static_assert((INT_MAX>>FRACTIONBITS)/MAX_PITCH > BUFFERSIZE,
               "MAX_PITCH and/or BUFFERSIZE are too large for FRACTIONBITS!");
 
-extern inline void InitiatePositionArrays(ALuint frac, ALuint increment, ALuint *frac_arr, ALuint *pos_arr, ALuint size);
+extern void InitiatePositionArrays(ALuint frac, ALuint increment, ALuint *frac_arr, ALuint *pos_arr, ALuint size);
 
-alignas(16) union ResamplerCoeffs ResampleCoeffs;
+union ResamplerCoeffs ResampleCoeffs;
 
 
 enum Resampler {
@@ -65,7 +65,7 @@ static HrtfMixerFunc MixHrtfSamples = MixHrtf_C;
 static MixerFunc MixSamples = Mix_C;
 static ResamplerFunc ResampleSamples = Resample_point32_C;
 
-static inline HrtfMixerFunc SelectHrtfMixer(void)
+static __inline HrtfMixerFunc SelectHrtfMixer(void)
 {
 #ifdef HAVE_SSE
     if((CPUCapFlags&CPU_CAP_SSE))
@@ -79,7 +79,7 @@ static inline HrtfMixerFunc SelectHrtfMixer(void)
     return MixHrtf_C;
 }
 
-static inline MixerFunc SelectMixer(void)
+static __inline MixerFunc SelectMixer(void)
 {
 #ifdef HAVE_SSE
     if((CPUCapFlags&CPU_CAP_SSE))
@@ -93,7 +93,7 @@ static inline MixerFunc SelectMixer(void)
     return Mix_C;
 }
 
-static inline ResamplerFunc SelectResampler(enum Resampler resampler)
+static __inline ResamplerFunc SelectResampler(enum Resampler resampler)
 {
     switch(resampler)
     {
@@ -148,7 +148,7 @@ static inline ResamplerFunc SelectResampler(enum Resampler resampler)
 #ifndef M_PI
 #define M_PI                         (3.14159265358979323846)
 #endif
-static inline double Sinc(double x)
+static __inline double Sinc(double x)
 {
     if(x == 0.0) return 1.0;
     return sin(x*M_PI) / (x*M_PI);
@@ -198,13 +198,13 @@ static double BesselI_0(double x)
  *
  *   k = 2 i / M - 1,   where 0 <= i <= M.
  */
-static inline double Kaiser(double b, double k)
+static __inline double Kaiser(double b, double k)
 {
     if(k <= -1.0 || k >= 1.0) return 0.0;
     return BesselI_0(b * sqrt(1.0 - (k*k))) / BesselI_0(b);
 }
 
-static inline double CalcKaiserBeta(double rejection)
+static __inline double CalcKaiserBeta(double rejection)
 {
     if(rejection > 50.0)
         return 0.1102 * (rejection - 8.7);
@@ -284,17 +284,17 @@ void aluInitMixer(void)
 }
 
 
-static inline ALfloat Sample_ALbyte(ALbyte val)
+static __inline ALfloat Sample_ALbyte(ALbyte val)
 { return val * (1.0f/127.0f); }
 
-static inline ALfloat Sample_ALshort(ALshort val)
+static __inline ALfloat Sample_ALshort(ALshort val)
 { return val * (1.0f/32767.0f); }
 
-static inline ALfloat Sample_ALfloat(ALfloat val)
+static __inline ALfloat Sample_ALfloat(ALfloat val)
 { return val; }
 
 #define DECL_TEMPLATE(T)                                                      \
-static inline void Load_##T(ALfloat *dst, const T *src, ALuint srcstep, ALuint samples)\
+static __inline void Load_##T(ALfloat *dst, const T *src, ALuint srcstep, ALuint samples)\
 {                                                                             \
     ALuint i;                                                                 \
     for(i = 0;i < samples;i++)                                                \
@@ -323,7 +323,7 @@ static void LoadSamples(ALfloat *dst, const ALvoid *src, ALuint srcstep, enum Fm
     }
 }
 
-static inline void SilenceSamples(ALfloat *dst, ALuint samples)
+static __inline void SilenceSamples(ALfloat *dst, ALuint samples)
 {
     ALuint i;
     for(i = 0;i < samples;i++)

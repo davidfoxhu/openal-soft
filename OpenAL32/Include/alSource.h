@@ -131,9 +131,9 @@ typedef struct ALsource {
     ALuint id;
 } ALsource;
 
-inline struct ALsource *LookupSource(ALCcontext *context, ALuint id)
+static __inline struct ALsource *LookupSource(ALCcontext *context, ALuint id)
 { return (struct ALsource*)LookupUIntMapKey(&context->SourceMap, id); }
-inline struct ALsource *RemoveSource(ALCcontext *context, ALuint id)
+static __inline struct ALsource *RemoveSource(ALCcontext *context, ALuint id)
 { return (struct ALsource*)RemoveUIntMapKey(&context->SourceMap, id); }
 
 ALvoid SetSourceState(ALsource *Source, ALCcontext *Context, ALenum state);

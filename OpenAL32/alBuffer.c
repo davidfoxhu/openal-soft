@@ -18,7 +18,7 @@
  * Or go to http://www.gnu.org/copyleft/lgpl.html
  */
 
-#include "config.h"
+#include "openal_config.h"
 
 #include <stdlib.h>
 #include <stdio.h>
@@ -36,10 +36,10 @@
 #include "sample_cvt.h"
 
 
-extern inline struct ALbuffer *LookupBuffer(ALCdevice *device, ALuint id);
-extern inline struct ALbuffer *RemoveBuffer(ALCdevice *device, ALuint id);
-extern inline ALuint FrameSizeFromUserFmt(enum UserFmtChannels chans, enum UserFmtType type);
-extern inline ALuint FrameSizeFromFmt(enum FmtChannels chans, enum FmtType type);
+extern struct ALbuffer *LookupBuffer(ALCdevice *device, ALuint id);
+extern struct ALbuffer *RemoveBuffer(ALCdevice *device, ALuint id);
+extern ALuint FrameSizeFromUserFmt(enum UserFmtChannels chans, enum UserFmtType type);
+extern ALuint FrameSizeFromFmt(enum FmtChannels chans, enum FmtType type);
 
 static ALboolean IsValidType(ALenum type) DECL_CONST;
 static ALboolean IsValidChannels(ALenum channels) DECL_CONST;

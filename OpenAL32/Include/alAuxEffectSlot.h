@@ -28,12 +28,12 @@ struct ALeffectStateVtable {
 };
 
 #define DEFINE_ALEFFECTSTATE_VTABLE(T)                                        \
-DECLARE_THUNK(T, ALeffectState, void, Destruct)                               \
+DECLARE_THUNK_VOID(T, ALeffectState, Destruct)                                \
 DECLARE_THUNK1(T, ALeffectState, ALboolean, deviceUpdate, ALCdevice*)         \
-DECLARE_THUNK2(T, ALeffectState, void, update, ALCdevice*, const ALeffectslot*) \
-DECLARE_THUNK4(T, ALeffectState, void, process, ALuint, const ALfloat*restrict, ALfloatBUFFERSIZE*restrict, ALuint) \
+DECLARE_THUNK2_VOID(T, ALeffectState, update, ALCdevice*, const ALeffectslot*) \
+DECLARE_THUNK4_VOID(T, ALeffectState, process, ALuint, const ALfloat*restrict, ALfloatBUFFERSIZE*restrict, ALuint) \
 static void T##_ALeffectState_Delete(void *ptr)                               \
-{ return T##_Delete(STATIC_UPCAST(T, ALeffectState, (ALeffectState*)ptr)); }  \
+{ T##_Delete(STATIC_UPCAST(T, ALeffectState, (ALeffectState*)ptr)); }  \
                                                                               \
 static const struct ALeffectStateVtable T##_ALeffectState_vtable = {          \
     T##_ALeffectState_Destruct,                                               \
@@ -82,9 +82,9 @@ typedef struct ALeffectslot {
     ALuint id;
 } ALeffectslot;
 
-inline struct ALeffectslot *LookupEffectSlot(ALCcontext *context, ALuint id)
+static __inline struct ALeffectslot *LookupEffectSlot(ALCcontext *context, ALuint id)
 { return (struct ALeffectslot*)LookupUIntMapKey(&context->EffectSlotMap, id); }
-inline struct ALeffectslot *RemoveEffectSlot(ALCcontext *context, ALuint id)
+static __inline struct ALeffectslot *RemoveEffectSlot(ALCcontext *context, ALuint id)
 { return (struct ALeffectslot*)RemoveUIntMapKey(&context->EffectSlotMap, id); }
 
 ALenum InitEffectSlot(ALeffectslot *slot);

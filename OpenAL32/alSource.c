@@ -18,7 +18,7 @@
  * Or go to http://www.gnu.org/copyleft/lgpl.html
  */
 
-#include "config.h"
+#include "openal_config.h"
 
 #include <stdlib.h>
 #include <limits.h>
@@ -39,8 +39,8 @@
 #include "threads.h"
 
 
-extern inline struct ALsource *LookupSource(ALCcontext *context, ALuint id);
-extern inline struct ALsource *RemoveSource(ALCcontext *context, ALuint id);
+extern struct ALsource *LookupSource(ALCcontext *context, ALuint id);
+extern struct ALsource *RemoveSource(ALCcontext *context, ALuint id);
 
 static ALvoid InitSourceParams(ALsource *Source);
 static ALint64 GetSourceSampleOffset(ALsource *Source);

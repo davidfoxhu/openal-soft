@@ -46,17 +46,17 @@ struct ALCbackendVtable {
 };
 
 #define DEFINE_ALCBACKEND_VTABLE(T)                                           \
-DECLARE_THUNK(T, ALCbackend, void, Destruct)                                  \
+DECLARE_THUNK_VOID(T, ALCbackend, Destruct)                                   \
 DECLARE_THUNK1(T, ALCbackend, ALCenum, open, const ALCchar*)                  \
-DECLARE_THUNK(T, ALCbackend, void, close)                                     \
+DECLARE_THUNK_VOID(T, ALCbackend, close)                                      \
 DECLARE_THUNK(T, ALCbackend, ALCboolean, reset)                               \
 DECLARE_THUNK(T, ALCbackend, ALCboolean, start)                               \
-DECLARE_THUNK(T, ALCbackend, void, stop)                                      \
+DECLARE_THUNK_VOID(T, ALCbackend, stop)                                       \
 DECLARE_THUNK2(T, ALCbackend, ALCenum, captureSamples, void*, ALCuint)        \
 DECLARE_THUNK(T, ALCbackend, ALCuint, availableSamples)                       \
 DECLARE_THUNK(T, ALCbackend, ALint64, getLatency)                             \
-DECLARE_THUNK(T, ALCbackend, void, lock)                                      \
-DECLARE_THUNK(T, ALCbackend, void, unlock)                                    \
+DECLARE_THUNK_VOID(T, ALCbackend, lock)                                       \
+DECLARE_THUNK_VOID(T, ALCbackend, unlock)                                     \
 static void T##_ALCbackend_Delete(void *ptr)                                  \
 { T##_Delete(STATIC_UPCAST(T, ALCbackend, (ALCbackend*)ptr)); }               \
                                                                               \
@@ -106,9 +106,9 @@ struct ALCbackendFactoryVtable {
 
 #define DEFINE_ALCBACKENDFACTORY_VTABLE(T)                                    \
 DECLARE_THUNK(T, ALCbackendFactory, ALCboolean, init)                         \
-DECLARE_THUNK(T, ALCbackendFactory, void, deinit)                             \
+DECLARE_THUNK_VOID(T, ALCbackendFactory, deinit)                              \
 DECLARE_THUNK1(T, ALCbackendFactory, ALCboolean, querySupport, ALCbackend_Type) \
-DECLARE_THUNK1(T, ALCbackendFactory, void, probe, enum DevProbe)              \
+DECLARE_THUNK1_VOID(T, ALCbackendFactory, probe, enum DevProbe)               \
 DECLARE_THUNK2(T, ALCbackendFactory, ALCbackend*, createBackend, ALCdevice*, ALCbackend_Type) \
                                                                               \
 static const struct ALCbackendFactoryVtable T##_ALCbackendFactory_vtable = {  \

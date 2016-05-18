@@ -20,7 +20,7 @@
 
 #include <stdlib.h>
 
-#include "config.h"
+#include "openal_config.h"
 #include "alError.h"
 #include "alMain.h"
 #include "alAuxEffectSlot.h"

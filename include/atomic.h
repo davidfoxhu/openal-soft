@@ -191,31 +191,31 @@ enum almemory_order {
  * on C99 (damn MSVC).
  */
 
-inline LONG AtomicAdd32(volatile LONG *dest, LONG incr)
+static __inline LONG AtomicAdd32(volatile LONG *dest, LONG incr)
 {
     return InterlockedExchangeAdd(dest, incr);
 }
-inline LONG AtomicSub32(volatile LONG *dest, LONG decr)
+static __inline LONG AtomicSub32(volatile LONG *dest, LONG decr)
 {
     return InterlockedExchangeAdd(dest, -decr);
 }
 
-inline LONG AtomicSwap32(volatile LONG *dest, LONG newval)
+static __inline LONG AtomicSwap32(volatile LONG *dest, LONG newval)
 {
     return InterlockedExchange(dest, newval);
 }
-inline LONGLONG AtomicSwap64(volatile LONGLONG *dest, LONGLONG newval)
+static __inline LONGLONG AtomicSwap64(volatile LONGLONG *dest, LONGLONG newval)
 {
     return InterlockedExchange64(dest, newval);
 }
 
-inline bool CompareAndSwap32(volatile LONG *dest, LONG newval, LONG *oldval)
+static __inline bool CompareAndSwap32(volatile LONG *dest, LONG newval, LONG *oldval)
 {
     LONG old = *oldval;
     *oldval = InterlockedCompareExchange(dest, newval, *oldval);
     return old == *oldval;
 }
-inline bool CompareAndSwap64(volatile LONGLONG *dest, LONGLONG newval, LONGLONG *oldval)
+static __inline bool CompareAndSwap64(volatile LONGLONG *dest, LONGLONG newval, LONGLONG *oldval)
 {
     LONGLONG old = *oldval;
     *oldval = InterlockedCompareExchange64(dest, newval, *oldval);
@@ -264,7 +264,58 @@ int _al_invalid_atomic_size(); /* not defined */
      (sizeof(T)==8) ? WRAP_CMPXCHG(T, CompareAndSwap64, &(_val)->value, (_newval), (_oldval)) : \
      (bool)_al_invalid_atomic_size())
 
-#else
+#elif OPENAL_TARGET_MARMALADE
+
+long AtomicAdd32(volatile long *dest, long incr);
+long AtomicSub32(volatile long *dest, long decr);
+long AtomicSwap32(volatile long *dest, long newval);
+long long AtomicSwap64(volatile long long *dest, long long newval);
+bool CompareAndSwap32(volatile long *dest, long newval, long *oldval);
+bool CompareAndSwap64(volatile long long *dest, long long newval, long long *oldval);
+
+#define WRAP_ADDSUB(T, _func, _ptr, _amnt)  ((T(*)(T volatile*,T))_func)((_ptr), (_amnt))
+#define WRAP_XCHG(T, _func, _ptr, _newval)  ((T(*)(T volatile*,T))_func)((_ptr), (_newval))
+#define WRAP_CMPXCHG(T, _func, _ptr, _newval, _oldval) ((bool(*)(T volatile*,T,T*))_func)((_ptr), (_newval), (_oldval))
+
+
+enum almemory_order {
+    almemory_order_relaxed,
+    almemory_order_consume,
+    almemory_order_acquire,
+    almemory_order_release,
+    almemory_order_acq_rel,
+    almemory_order_seq_cst
+};
+
+#define ATOMIC(T)  struct { T volatile value; }
+
+#define ATOMIC_INIT(_val, _newval)  do { (_val)->value = (_newval); } while(0)
+#define ATOMIC_INIT_STATIC(_newval) {(_newval)}
+
+#define ATOMIC_LOAD(_val, ...)  ((_val)->value)
+#define ATOMIC_STORE(_val, _newval, ...)  do {  \
+    (_val)->value = (_newval);                  \
+} while(0)
+
+int _al_invalid_atomic_size(); /* not defined */
+
+#define ATOMIC_ADD(T, _val, _incr, ...)                                       \
+    ((sizeof(T)==4) ? WRAP_ADDSUB(T, AtomicAdd32, &(_val)->value, (_incr)) :  \
+     (T)_al_invalid_atomic_size())
+#define ATOMIC_SUB(T, _val, _decr, ...)                                       \
+    ((sizeof(T)==4) ? WRAP_ADDSUB(T, AtomicSub32, &(_val)->value, (_decr)) :  \
+     (T)_al_invalid_atomic_size())
+
+#define ATOMIC_EXCHANGE(T, _val, _newval, ...)                                \
+    ((sizeof(T)==4) ? WRAP_XCHG(T, AtomicSwap32, &(_val)->value, (_newval)) : \
+     (sizeof(T)==8) ? WRAP_XCHG(T, AtomicSwap64, &(_val)->value, (_newval)) : \
+     (T)_al_invalid_atomic_size())
+#define ATOMIC_COMPARE_EXCHANGE_STRONG(T, _val, _oldval, _newval, ...)        \
+    ((sizeof(T)==4) ? WRAP_CMPXCHG(T, CompareAndSwap32, &(_val)->value, (_newval), (_oldval)) : \
+     (sizeof(T)==8) ? WRAP_CMPXCHG(T, CompareAndSwap64, &(_val)->value, (_newval), (_oldval)) : \
+     (bool)_al_invalid_atomic_size())
+
+#else// OPENAL_TARGET_MARMALADE
 
 #error "No atomic functions available on this platform!"
 
@@ -295,18 +346,18 @@ int _al_invalid_atomic_size(); /* not defined */
 typedef unsigned int uint;
 typedef ATOMIC(uint) RefCount;
 
-inline void InitRef(RefCount *ptr, uint value)
+static __inline void InitRef(RefCount *ptr, uint value)
 { ATOMIC_INIT(ptr, value); }
-inline uint ReadRef(RefCount *ptr)
+static __inline uint ReadRef(RefCount *ptr)
 { return ATOMIC_LOAD(ptr); }
-inline uint IncrementRef(RefCount *ptr)
+static __inline uint IncrementRef(RefCount *ptr)
 { return ATOMIC_ADD(uint, ptr, 1)+1; }
-inline uint DecrementRef(RefCount *ptr)
+static __inline uint DecrementRef(RefCount *ptr)
 { return ATOMIC_SUB(uint, ptr, 1)-1; }
 
 
 /* NOTE: Not atomic! */
-inline int ExchangeInt(volatile int *ptr, int newval)
+static __inline int ExchangeInt(volatile int *ptr, int newval)
 {
     int old = *ptr;
     *ptr = newval;
@@ -315,7 +366,7 @@ inline int ExchangeInt(volatile int *ptr, int newval)
 
 typedef void *volatile XchgPtr;
 /* NOTE: Not atomic! */
-inline void *ExchangePtr(XchgPtr *ptr, void *newval)
+static __inline void *ExchangePtr(XchgPtr *ptr, void *newval)
 {
     void *old = *ptr;
     *ptr = newval;

@@ -1,4 +1,4 @@
-#include "config.h"
+#include "openal_config.h"
 
 #include "alMain.h"
 #include "alSource.h"
@@ -8,15 +8,15 @@
 #include "align.h"
 
 
-static inline void SetupCoeffs(ALfloat (*restrict OutCoeffs)[2],
+void SetupCoeffs(ALfloat (*restrict OutCoeffs)[2],
                                const HrtfParams *hrtfparams,
                                ALuint IrSize, ALuint Counter);
-static inline void ApplyCoeffsStep(ALuint Offset, ALfloat (*restrict Values)[2],
+void ApplyCoeffsStep(ALuint Offset, ALfloat (*restrict Values)[2],
                                    const ALuint irSize,
                                    ALfloat (*restrict Coeffs)[2],
                                    const ALfloat (*restrict CoeffStep)[2],
                                    ALfloat left, ALfloat right);
-static inline void ApplyCoeffs(ALuint Offset, ALfloat (*restrict Values)[2],
+void ApplyCoeffs(ALuint Offset, ALfloat (*restrict Values)[2],
                                const ALuint irSize,
                                ALfloat (*restrict Coeffs)[2],
                                ALfloat left, ALfloat right);

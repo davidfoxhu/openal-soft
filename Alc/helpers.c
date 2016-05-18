@@ -26,7 +26,7 @@
 #endif
 #endif
 
-#include "config.h"
+#include "openal_config.h"
 
 #include <stdlib.h>
 #include <time.h>
@@ -39,6 +39,7 @@
 #include <dirent.h>
 #endif
 
+#ifndef OPENAL_TARGET_MARMALADE
 #ifndef AL_NO_UID_DEFS
 #if defined(HAVE_GUIDDEF_H) || defined(HAVE_INITGUID_H)
 #define INITGUID
@@ -94,6 +95,7 @@ DEFINE_PROPERTYKEY(PKEY_AudioEndpoint_FormFactor, 0x1da5d803, 0xd492, 0x4edd, 0x
 #include <shlobj.h>
 #endif
 
+#endif// OPENAL_TARGET_MARMALADE
 #include "alMain.h"
 #include "alu.h"
 #include "atomic.h"
@@ -103,10 +105,21 @@ DEFINE_PROPERTYKEY(PKEY_AudioEndpoint_FormFactor, 0x1da5d803, 0xd492, 0x4edd, 0x
 #include "compat.h"
 #include "threads.h"
 
-
-extern inline ALuint NextPowerOf2(ALuint value);
-extern inline ALint fastf2i(ALfloat f);
-extern inline ALuint fastf2u(ALfloat f);
+#ifdef OPENAL_TARGET_MARMALADE
+ALuint CPUCapFlags = 0;
+void SetMixerFPUMode(FPUCtl *ctl)
+{
+}
+void RestoreFPUMode(const FPUCtl *ctl)
+{
+}
+void FillCPUCaps(ALuint capfilter)
+{
+}
+#else // OPENAL_TARGET_MARMALADE
+extern ALuint NextPowerOf2(ALuint value);
+extern ALint fastf2i(ALfloat f);
+extern ALuint fastf2u(ALfloat f);
 
 
 ALuint CPUCapFlags = 0;
@@ -473,7 +486,7 @@ void al_print(const char *type, const char *func, const char *fmt, ...)
 }
 
 
-static inline int is_slash(int c)
+static __inline int is_slash(int c)
 { return (c == '\\' || c == '/'); }
 
 FILE *OpenDataFile(const char *fname, const char *subdir)
@@ -1312,6 +1325,7 @@ void SetRTPriority(void)
     if(failed)
         ERR("Failed to set priority level for thread\n");
 }
+#endif// OPENAL_TARGET_MARMALADE
 
 
 ALboolean vector_reserve(char *ptr, size_t base_size, size_t obj_size, size_t obj_count, ALboolean exact)
@@ -1384,10 +1398,10 @@ ALboolean vector_insert(char *ptr, size_t base_size, size_t obj_size, void *ins_
 }
 
 
-extern inline void al_string_deinit(al_string *str);
-extern inline size_t al_string_length(const_al_string str);
-extern inline ALboolean al_string_empty(const_al_string str);
-extern inline const al_string_char_type *al_string_get_cstr(const_al_string str);
+extern void al_string_deinit(al_string *str);
+extern size_t al_string_length(const_al_string str);
+extern ALboolean al_string_empty(const_al_string str);
+extern const al_string_char_type *al_string_get_cstr(const_al_string str);
 
 void al_string_clear(al_string *str)
 {
@@ -1399,7 +1413,7 @@ void al_string_clear(al_string *str)
     *VECTOR_ITER_END(*str) = 0;
 }
 
-static inline int al_string_compare(const al_string_char_type *str1, size_t str1len,
+static __inline int al_string_compare(const al_string_char_type *str1, size_t str1len,
                                     const al_string_char_type *str2, size_t str2len)
 {
     size_t complen = (str1len < str2len) ? str1len : str2len;
@@ -1507,3 +1521,139 @@ void al_string_append_wrange(al_string *str, const wchar_t *from, const wchar_t 
     }
 }
 #endif
+#include <s3eFile.h>
+#include <stdio.h>
+#include <stdlib.h>
+#include <string.h>
+#include <memory.h>
+vector_al_string SearchDataFiles(const char *ext, const char *subdir)
+{
+    vector_al_string results = VECTOR_INIT_STATIC();
+    s3eFileList* pList = s3eFileListDirectory(subdir);
+    char szBuff[1024];
+    while (s3eFileListNext(pList, szBuff, sizeof(szBuff)) == S3E_RESULT_SUCCESS)
+    {
+        if (strlen(szBuff) > strlen(ext) &&
+            strncmp(szBuff + strlen(szBuff) - strlen(ext), ext, strlen(ext)) == 0
+           )
+        {
+            al_string str = AL_STRING_INIT_STATIC();
+
+            al_string_copy_cstr(&str, subdir);
+            al_string_append_char(&str, '\\');
+            al_string_append_cstr(&str, szBuff);
+
+            VECTOR_PUSH_BACK(results, str);        
+        }
+    }
+    s3eFileListClose(pList);
+    return results;
+}
+
+void SetRTPriority(void)
+{
+}
+
+#include <s3eThread.h>
+static s3eThreadLock* g_Lock = NULL;
+void alcInitLock()
+{
+    g_Lock = s3eThreadLockCreate();
+}
+
+void alcDeinitLock()
+{
+    s3eThreadLockDestroy(g_Lock);
+}
+
+long AtomicAdd32(volatile long *dest, long incr)
+{
+    long old = 0;
+    s3eThreadLockAcquire(g_Lock, -1);
+    old = *dest;
+    *dest += incr;
+    s3eThreadLockRelease(g_Lock);
+    return old;
+}
+
+long AtomicSub32(volatile long *dest, long decr)
+{
+    long old = 0;
+    s3eThreadLockAcquire(g_Lock, -1);
+    old = *dest;
+    *dest -= decr;
+    s3eThreadLockRelease(g_Lock);
+    return old;
+}
+
+long AtomicSwap32(volatile long *dest, long newval)
+{
+    long nRet = 0;
+    s3eThreadLockAcquire(g_Lock, -1);
+    nRet = *dest;
+    *dest = newval;
+    s3eThreadLockRelease(g_Lock);
+    return nRet;
+}
+
+long long AtomicSwap64(volatile long long *dest, long long newval)
+{
+    long long nRet = 0;
+    s3eThreadLockAcquire(g_Lock, -1);
+    nRet = *dest;
+    *dest = newval;
+    s3eThreadLockRelease(g_Lock);
+    return nRet;
+}
+
+bool CompareAndSwap32(volatile long *dest, long newval, long *oldval)
+{
+    long old = 0;
+    s3eThreadLockAcquire(g_Lock, -1);
+    old = *oldval;
+    if (*dest == *oldval)
+    {
+        *oldval = *dest;
+        *dest = newval;
+    }
+    else
+        *oldval = *dest;
+    s3eThreadLockRelease(g_Lock);
+    return old == *oldval;
+}
+bool CompareAndSwap64(volatile long long *dest, long long newval, long long *oldval)
+{
+    long long old = 0;
+    s3eThreadLockAcquire(g_Lock, -1);
+    old = *oldval;
+    if (*dest == *oldval)
+    {
+        *oldval = *dest;
+        *dest = newval;
+    }
+    else
+        *oldval = *dest;
+    s3eThreadLockRelease(g_Lock);
+    return old == *oldval;
+}
+
+#include "s3eMemory.h"
+void* al_malloc(size_t alignment, size_t size)
+{
+    size_t nRealSize = size + (alignment - (size % alignment));
+    void* pRet = malloc(nRealSize);
+    memset(pRet, 0, nRealSize);
+    return pRet;
+}
+
+void* al_calloc(size_t alignment, size_t size)
+{
+    void* pRet = calloc(alignment, size);
+    memset(pRet, 0, size);
+    return pRet;
+}
+
+void al_free(void *ptr)
+{
+    free(ptr);
+}

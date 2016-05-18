@@ -1,5 +1,5 @@
 
-#include "config.h"
+#include "openal_config.h"
 
 #include "uintmap.h"
 
@@ -7,10 +7,10 @@
 #include <string.h>
 
 
-extern inline void LockUIntMapRead(UIntMap *map);
-extern inline void UnlockUIntMapRead(UIntMap *map);
-extern inline void LockUIntMapWrite(UIntMap *map);
-extern inline void UnlockUIntMapWrite(UIntMap *map);
+extern void LockUIntMapRead(UIntMap *map);
+extern void UnlockUIntMapRead(UIntMap *map);
+extern void LockUIntMapWrite(UIntMap *map);
+extern void UnlockUIntMapWrite(UIntMap *map);
 
 
 void InitUIntMap(UIntMap *map, ALsizei limit)

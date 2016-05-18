@@ -27,13 +27,13 @@ ALenum InsertUIntMapEntry(UIntMap *map, ALuint key, ALvoid *value);
 ALvoid *RemoveUIntMapKey(UIntMap *map, ALuint key);
 ALvoid *LookupUIntMapKey(UIntMap *map, ALuint key);
 
-inline void LockUIntMapRead(UIntMap *map)
+static __inline void LockUIntMapRead(UIntMap *map)
 { ReadLock(&map->lock); }
-inline void UnlockUIntMapRead(UIntMap *map)
+static __inline void UnlockUIntMapRead(UIntMap *map)
 { ReadUnlock(&map->lock); }
-inline void LockUIntMapWrite(UIntMap *map)
+static __inline void LockUIntMapWrite(UIntMap *map)
 { WriteLock(&map->lock); }
-inline void UnlockUIntMapWrite(UIntMap *map)
+static __inline void UnlockUIntMapWrite(UIntMap *map)
 { WriteUnlock(&map->lock); }
 
 #ifdef __cplusplus

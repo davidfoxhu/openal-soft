@@ -60,10 +60,10 @@ typedef struct BsincState {
 
 
 typedef union aluVector {
-    alignas(16) ALfloat v[4];
+    ALfloat v[4];
 } aluVector;
 
-inline void aluVectorSet(aluVector *vector, ALfloat x, ALfloat y, ALfloat z, ALfloat w)
+static __inline void aluVectorSet(aluVector *vector, ALfloat x, ALfloat y, ALfloat z, ALfloat w)
 {
     vector->v[0] = x;
     vector->v[1] = y;
@@ -73,10 +73,10 @@ inline void aluVectorSet(aluVector *vector, ALfloat x, ALfloat y, ALfloat z, ALf
 
 
 typedef union aluMatrixf {
-    alignas(16) ALfloat m[4][4];
+     ALfloat m[4][4];
 } aluMatrixf;
 
-inline void aluMatrixfSetRow(aluMatrixf *matrix, ALuint row,
+static __inline void aluMatrixfSetRow(aluMatrixf *matrix, ALuint row,
                              ALfloat m0, ALfloat m1, ALfloat m2, ALfloat m3)
 {
     matrix->m[row][0] = m0;
@@ -85,7 +85,7 @@ inline void aluMatrixfSetRow(aluMatrixf *matrix, ALuint row,
     matrix->m[row][3] = m3;
 }
 
-inline void aluMatrixfSet(aluMatrixf *matrix, ALfloat m00, ALfloat m01, ALfloat m02, ALfloat m03,
+static __inline void aluMatrixfSet(aluMatrixf *matrix, ALfloat m00, ALfloat m01, ALfloat m02, ALfloat m03,
                                               ALfloat m10, ALfloat m11, ALfloat m12, ALfloat m13,
                                               ALfloat m20, ALfloat m21, ALfloat m22, ALfloat m23,
                                               ALfloat m30, ALfloat m31, ALfloat m32, ALfloat m33)
@@ -98,10 +98,10 @@ inline void aluMatrixfSet(aluMatrixf *matrix, ALfloat m00, ALfloat m01, ALfloat 
 
 
 typedef union aluMatrixd {
-    alignas(16) ALdouble m[4][4];
+    ALdouble m[4][4];
 } aluMatrixd;
 
-inline void aluMatrixdSetRow(aluMatrixd *matrix, ALuint row,
+static __inline void aluMatrixdSetRow(aluMatrixd *matrix, ALuint row,
                              ALdouble m0, ALdouble m1, ALdouble m2, ALdouble m3)
 {
     matrix->m[row][0] = m0;
@@ -110,7 +110,7 @@ inline void aluMatrixdSetRow(aluMatrixd *matrix, ALuint row,
     matrix->m[row][3] = m3;
 }
 
-inline void aluMatrixdSet(aluMatrixd *matrix, ALdouble m00, ALdouble m01, ALdouble m02, ALdouble m03,
+static __inline void aluMatrixdSet(aluMatrixd *matrix, ALdouble m00, ALdouble m01, ALdouble m02, ALdouble m03,
                                               ALdouble m10, ALdouble m11, ALdouble m12, ALdouble m13,
                                               ALdouble m20, ALdouble m21, ALdouble m22, ALdouble m23,
                                               ALdouble m30, ALdouble m31, ALdouble m32, ALdouble m33)
@@ -203,46 +203,46 @@ typedef void (*HrtfMixerFunc)(ALfloat (*restrict OutBuffer)[BUFFERSIZE], const A
 #define FRACTIONMASK (FRACTIONONE-1)
 
 
-inline ALfloat minf(ALfloat a, ALfloat b)
+static __inline ALfloat minf(ALfloat a, ALfloat b)
 { return ((a > b) ? b : a); }
-inline ALfloat maxf(ALfloat a, ALfloat b)
+static __inline ALfloat maxf(ALfloat a, ALfloat b)
 { return ((a > b) ? a : b); }
-inline ALfloat clampf(ALfloat val, ALfloat min, ALfloat max)
+static __inline ALfloat clampf(ALfloat val, ALfloat min, ALfloat max)
 { return minf(max, maxf(min, val)); }
 
-inline ALdouble mind(ALdouble a, ALdouble b)
+static __inline ALdouble mind(ALdouble a, ALdouble b)
 { return ((a > b) ? b : a); }
-inline ALdouble maxd(ALdouble a, ALdouble b)
+static __inline ALdouble maxd(ALdouble a, ALdouble b)
 { return ((a > b) ? a : b); }
-inline ALdouble clampd(ALdouble val, ALdouble min, ALdouble max)
+static __inline ALdouble clampd(ALdouble val, ALdouble min, ALdouble max)
 { return mind(max, maxd(min, val)); }
 
-inline ALuint minu(ALuint a, ALuint b)
+static __inline ALuint minu(ALuint a, ALuint b)
 { return ((a > b) ? b : a); }
-inline ALuint maxu(ALuint a, ALuint b)
+static __inline ALuint maxu(ALuint a, ALuint b)
 { return ((a > b) ? a : b); }
-inline ALuint clampu(ALuint val, ALuint min, ALuint max)
+static __inline ALuint clampu(ALuint val, ALuint min, ALuint max)
 { return minu(max, maxu(min, val)); }
 
-inline ALint mini(ALint a, ALint b)
+static __inline ALint mini(ALint a, ALint b)
 { return ((a > b) ? b : a); }
-inline ALint maxi(ALint a, ALint b)
+static __inline ALint maxi(ALint a, ALint b)
 { return ((a > b) ? a : b); }
-inline ALint clampi(ALint val, ALint min, ALint max)
+static __inline ALint clampi(ALint val, ALint min, ALint max)
 { return mini(max, maxi(min, val)); }
 
-inline ALint64 mini64(ALint64 a, ALint64 b)
+static __inline ALint64 mini64(ALint64 a, ALint64 b)
 { return ((a > b) ? b : a); }
-inline ALint64 maxi64(ALint64 a, ALint64 b)
+static __inline ALint64 maxi64(ALint64 a, ALint64 b)
 { return ((a > b) ? a : b); }
-inline ALint64 clampi64(ALint64 val, ALint64 min, ALint64 max)
+static __inline ALint64 clampi64(ALint64 val, ALint64 min, ALint64 max)
 { return mini64(max, maxi64(min, val)); }
 
-inline ALuint64 minu64(ALuint64 a, ALuint64 b)
+static __inline ALuint64 minu64(ALuint64 a, ALuint64 b)
 { return ((a > b) ? b : a); }
-inline ALuint64 maxu64(ALuint64 a, ALuint64 b)
+static __inline ALuint64 maxu64(ALuint64 a, ALuint64 b)
 { return ((a > b) ? a : b); }
-inline ALuint64 clampu64(ALuint64 val, ALuint64 min, ALuint64 max)
+static __inline ALuint64 clampu64(ALuint64 val, ALuint64 min, ALuint64 max)
 { return minu64(max, maxu64(min, val)); }
 
 
@@ -250,21 +250,21 @@ union ResamplerCoeffs {
     ALfloat FIR4[FRACTIONONE][4];
     ALfloat FIR8[FRACTIONONE][8];
 };
-extern alignas(16) union ResamplerCoeffs ResampleCoeffs;
+extern union ResamplerCoeffs ResampleCoeffs;
 
-extern alignas(16) const ALfloat bsincTab[18840];
+extern const ALfloat bsincTab[18840];
 
 
-inline ALfloat lerp(ALfloat val1, ALfloat val2, ALfloat mu)
+static __inline ALfloat lerp(ALfloat val1, ALfloat val2, ALfloat mu)
 {
     return val1 + (val2-val1)*mu;
 }
-inline ALfloat resample_fir4(ALfloat val0, ALfloat val1, ALfloat val2, ALfloat val3, ALuint frac)
+static __inline ALfloat resample_fir4(ALfloat val0, ALfloat val1, ALfloat val2, ALfloat val3, ALuint frac)
 {
     const ALfloat *k = ResampleCoeffs.FIR4[frac];
     return k[0]*val0 + k[1]*val1 + k[2]*val2 + k[3]*val3;
 }
-inline ALfloat resample_fir8(ALfloat val0, ALfloat val1, ALfloat val2, ALfloat val3, ALfloat val4, ALfloat val5, ALfloat val6, ALfloat val7, ALuint frac)
+static __inline ALfloat resample_fir8(ALfloat val0, ALfloat val1, ALfloat val2, ALfloat val3, ALfloat val4, ALfloat val5, ALfloat val6, ALfloat val7, ALuint frac)
 {
     const ALfloat *k = ResampleCoeffs.FIR8[frac];
     return k[0]*val0 + k[1]*val1 + k[2]*val2 + k[3]*val3 +

@@ -18,7 +18,7 @@
  * Or go to http://www.gnu.org/copyleft/lgpl.html
  */
 
-#include "config.h"
+#include "openal_config.h"
 
 #include <stdlib.h>
 #include <math.h>
@@ -34,9 +34,9 @@
 
 ALboolean DisabledEffects[MAX_EFFECTS];
 
-extern inline struct ALeffect *LookupEffect(ALCdevice *device, ALuint id);
-extern inline struct ALeffect *RemoveEffect(ALCdevice *device, ALuint id);
-extern inline ALboolean IsReverbEffect(ALenum type);
+extern struct ALeffect *LookupEffect(ALCdevice *device, ALuint id);
+extern struct ALeffect *RemoveEffect(ALCdevice *device, ALuint id);
+extern ALboolean IsReverbEffect(ALenum type);
 
 static void InitEffectParams(ALeffect *effect, ALenum type);
 

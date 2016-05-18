@@ -1,4 +1,4 @@
-#include "config.h"
+#include "openal_config.h"
 
 #include <assert.h>
 
@@ -8,13 +8,13 @@
 #include "alAuxEffectSlot.h"
 
 
-static inline ALfloat point32(const ALfloat *vals, ALuint UNUSED(frac))
+static __inline ALfloat point32(const ALfloat *vals, ALuint UNUSED(frac))
 { return vals[0]; }
-static inline ALfloat lerp32(const ALfloat *vals, ALuint frac)
+static __inline ALfloat lerp32(const ALfloat *vals, ALuint frac)
 { return lerp(vals[0], vals[1], frac * (1.0f/FRACTIONONE)); }
-static inline ALfloat fir4_32(const ALfloat *vals, ALuint frac)
+static __inline ALfloat fir4_32(const ALfloat *vals, ALuint frac)
 { return resample_fir4(vals[-1], vals[0], vals[1], vals[2], frac); }
-static inline ALfloat fir8_32(const ALfloat *vals, ALuint frac)
+static __inline ALfloat fir8_32(const ALfloat *vals, ALuint frac)
 { return resample_fir8(vals[-3], vals[-2], vals[-1], vals[0], vals[1], vals[2], vals[3], vals[4], frac); }
 
 
@@ -101,7 +101,7 @@ void ALfilterState_processC(ALfilterState *filter, ALfloat *restrict dst, const 
 }
 
 
-static inline void SetupCoeffs(ALfloat (*restrict OutCoeffs)[2],
+static __inline void SetupCoeffs(ALfloat (*restrict OutCoeffs)[2],
                                const HrtfParams *hrtfparams,
                                ALuint IrSize, ALuint Counter)
 {
@@ -113,7 +113,7 @@ static inline void SetupCoeffs(ALfloat (*restrict OutCoeffs)[2],
     }
 }
 
-static inline void ApplyCoeffsStep(ALuint Offset, ALfloat (*restrict Values)[2],
+static __inline void ApplyCoeffsStep(ALuint Offset, ALfloat (*restrict Values)[2],
                                    const ALuint IrSize,
                                    ALfloat (*restrict Coeffs)[2],
                                    const ALfloat (*restrict CoeffStep)[2],
@@ -130,7 +130,7 @@ static inline void ApplyCoeffsStep(ALuint Offset, ALfloat (*restrict Values)[2],
     }
 }
 
-static inline void ApplyCoeffs(ALuint Offset, ALfloat (*restrict Values)[2],
+static __inline void ApplyCoeffs(ALuint Offset, ALfloat (*restrict Values)[2],
                                const ALuint IrSize,
                                ALfloat (*restrict Coeffs)[2],
                                ALfloat left, ALfloat right)

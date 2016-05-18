@@ -18,7 +18,7 @@
  * Or go to http://www.gnu.org/copyleft/lgpl.html
  */
 
-#include "config.h"
+#include "openal_config.h"
 
 #include "threads.h"
 
@@ -29,17 +29,17 @@
 #include "uintmap.h"
 
 
-extern inline althrd_t althrd_current(void);
-extern inline int althrd_equal(althrd_t thr0, althrd_t thr1);
-extern inline void althrd_exit(int res);
-extern inline void althrd_yield(void);
+extern althrd_t althrd_current(void);
+extern int althrd_equal(althrd_t thr0, althrd_t thr1);
+extern void althrd_exit(int res);
+extern void althrd_yield(void);
 
-extern inline int almtx_lock(almtx_t *mtx);
-extern inline int almtx_unlock(almtx_t *mtx);
-extern inline int almtx_trylock(almtx_t *mtx);
+extern int almtx_lock(almtx_t *mtx);
+extern int almtx_unlock(almtx_t *mtx);
+extern int almtx_trylock(almtx_t *mtx);
 
-extern inline void *altss_get(altss_t tss_id);
-extern inline int altss_set(altss_t tss_id, void *val);
+extern void *altss_get(altss_t tss_id);
+extern int altss_set(altss_t tss_id, void *val);
 
 
 #ifndef UNUSED
@@ -490,8 +490,8 @@ void alcall_once(alonce_flag *once, void (*callback)(void))
 #endif
 
 
-extern inline int althrd_sleep(const struct timespec *ts, struct timespec *rem);
-extern inline void alcall_once(alonce_flag *once, void (*callback)(void));
+extern int althrd_sleep(const struct timespec *ts, struct timespec *rem);
+extern void alcall_once(alonce_flag *once, void (*callback)(void));
 
 
 void althrd_setname(althrd_t thr, const char *name)

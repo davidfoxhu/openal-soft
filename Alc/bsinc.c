@@ -1,5 +1,5 @@
 
-#include "config.h"
+#include "openal_config.h"
 
 #include "AL/al.h"
 #include "align.h"

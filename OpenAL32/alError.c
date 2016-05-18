@@ -18,14 +18,16 @@
  * Or go to http://www.gnu.org/copyleft/lgpl.html
  */
 
-#include "config.h"
+#include "openal_config.h"
 
 #include <signal.h>
 
+#ifndef OPENAL_TARGET_MARMALADE
 #ifdef HAVE_WINDOWS_H
 #define WIN32_LEAN_AND_MEAN
 #include <windows.h>
 #endif
+#endif //OPENAL_TARGET_MARMALADE
 
 #include "alMain.h"
 #include "AL/alc.h"

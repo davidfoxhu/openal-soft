@@ -18,7 +18,7 @@
  * Or go to http://www.gnu.org/copyleft/lgpl.html
  */
 
-#include "config.h"
+#include "openal_config.h"
 
 #include <stdlib.h>
 #include <math.h>
@@ -32,15 +32,15 @@
 #include "alSource.h"
 
 
-extern inline struct ALeffectslot *LookupEffectSlot(ALCcontext *context, ALuint id);
-extern inline struct ALeffectslot *RemoveEffectSlot(ALCcontext *context, ALuint id);
+extern struct ALeffectslot *LookupEffectSlot(ALCcontext *context, ALuint id);
+extern struct ALeffectslot *RemoveEffectSlot(ALCcontext *context, ALuint id);
 
 static ALenum AddEffectSlotArray(ALCcontext *Context, ALeffectslot **start, ALsizei count);
 static void RemoveEffectSlotArray(ALCcontext *Context, const ALeffectslot *slot);
 
 
 static UIntMap EffectStateFactoryMap;
-static inline ALeffectStateFactory *getFactoryByType(ALenum type)
+static __inline ALeffectStateFactory *getFactoryByType(ALenum type)
 {
     ALeffectStateFactory* (*getFactory)(void) = LookupUIntMapKey(&EffectStateFactoryMap, type);
     if(getFactory != NULL)

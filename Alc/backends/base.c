@@ -1,5 +1,5 @@
 
-#include "config.h"
+#include "openal_config.h"
 
 #include <stdlib.h>
 
@@ -69,7 +69,7 @@ typedef struct PlaybackWrapper {
 } PlaybackWrapper;
 
 static void PlaybackWrapper_Construct(PlaybackWrapper *self, ALCdevice *device, const BackendFuncs *funcs);
-static DECLARE_FORWARD(PlaybackWrapper, ALCbackend, void, Destruct)
+static DECLARE_FORWARD_RETURN_VOID(PlaybackWrapper, ALCbackend, Destruct)
 static ALCenum PlaybackWrapper_open(PlaybackWrapper *self, const ALCchar *name);
 static void PlaybackWrapper_close(PlaybackWrapper *self);
 static ALCboolean PlaybackWrapper_reset(PlaybackWrapper *self);
@@ -78,8 +78,8 @@ static void PlaybackWrapper_stop(PlaybackWrapper *self);
 static DECLARE_FORWARD2(PlaybackWrapper, ALCbackend, ALCenum, captureSamples, void*, ALCuint)
 static DECLARE_FORWARD(PlaybackWrapper, ALCbackend, ALCuint, availableSamples)
 static DECLARE_FORWARD(PlaybackWrapper, ALCbackend, ALint64, getLatency)
-static DECLARE_FORWARD(PlaybackWrapper, ALCbackend, void, lock)
-static DECLARE_FORWARD(PlaybackWrapper, ALCbackend, void, unlock)
+static DECLARE_FORWARD_RETURN_VOID(PlaybackWrapper, ALCbackend, lock)
+static DECLARE_FORWARD_RETURN_VOID(PlaybackWrapper, ALCbackend, unlock)
 DECLARE_DEFAULT_ALLOCATORS(PlaybackWrapper)
 DEFINE_ALCBACKEND_VTABLE(PlaybackWrapper);
 
@@ -129,7 +129,7 @@ typedef struct CaptureWrapper {
 } CaptureWrapper;
 
 static void CaptureWrapper_Construct(CaptureWrapper *self, ALCdevice *device, const BackendFuncs *funcs);
-static DECLARE_FORWARD(CaptureWrapper, ALCbackend, void, Destruct)
+static DECLARE_FORWARD_RETURN_VOID(CaptureWrapper, ALCbackend, Destruct)
 static ALCenum CaptureWrapper_open(CaptureWrapper *self, const ALCchar *name);
 static void CaptureWrapper_close(CaptureWrapper *self);
 static DECLARE_FORWARD(CaptureWrapper, ALCbackend, ALCboolean, reset)
@@ -138,8 +138,8 @@ static void CaptureWrapper_stop(CaptureWrapper *self);
 static ALCenum CaptureWrapper_captureSamples(CaptureWrapper *self, void *buffer, ALCuint samples);
 static ALCuint CaptureWrapper_availableSamples(CaptureWrapper *self);
 static DECLARE_FORWARD(CaptureWrapper, ALCbackend, ALint64, getLatency)
-static DECLARE_FORWARD(CaptureWrapper, ALCbackend, void, lock)
-static DECLARE_FORWARD(CaptureWrapper, ALCbackend, void, unlock)
+static DECLARE_FORWARD_RETURN_VOID(CaptureWrapper, ALCbackend, lock)
+static DECLARE_FORWARD_RETURN_VOID(CaptureWrapper, ALCbackend, unlock)
 DECLARE_DEFAULT_ALLOCATORS(CaptureWrapper)
 DEFINE_ALCBACKEND_VTABLE(CaptureWrapper);
 

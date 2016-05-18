@@ -166,6 +166,11 @@ typedef void ALCvoid;
 #define ALC_ALL_DEVICES_SPECIFIER                0x1013
 
 
+ALC_API void alcInit();
+ALC_API void alcDeinit();
+ALC_API void alcSetConfigPath(const char* szConfigPath);
+ALC_API void alcSetHRTFDirPath(const char* szHRTFPath);
+
 /** Context management. */
 ALC_API ALCcontext* ALC_APIENTRY alcCreateContext(ALCdevice *device, const ALCint* attrlist);
 ALC_API ALCboolean  ALC_APIENTRY alcMakeContextCurrent(ALCcontext *context);

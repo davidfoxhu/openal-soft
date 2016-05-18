@@ -18,7 +18,7 @@
  * Or go to http://www.gnu.org/copyleft/lgpl.html
  */
 
-#include "config.h"
+#include "openal_config.h"
 
 #include <math.h>
 #include <stdlib.h>
@@ -97,6 +97,9 @@ static struct BackendInfo BackendList[] = {
 #endif
 #ifdef HAVE_OPENSL
     { "opensl", NULL, alc_opensl_init, alc_opensl_deinit, alc_opensl_probe, EmptyFuncs },
+#endif
+#ifdef HAVE_S3E_SOUND
+    { "s3e", NULL, alc_s3e_init, alc_s3e_deinit, alc_s3e_probe, EmptyFuncs },
 #endif
 
     { "null", ALCnullBackendFactory_getFactory, NULL, NULL, NULL, EmptyFuncs },
@@ -770,12 +773,12 @@ static const ALCint alcEFXMinorVersion = 0;
 static ATOMIC(ALCdevice*) DeviceList = ATOMIC_INIT_STATIC(NULL);
 
 static almtx_t ListLock;
-static inline void LockLists(void)
+static __inline void LockLists(void)
 {
     int lockret = almtx_lock(&ListLock);
     assert(lockret == althrd_success);
 }
-static inline void UnlockLists(void)
+static __inline void UnlockLists(void)
 {
     int unlockret = almtx_unlock(&ListLock);
     assert(unlockret == althrd_success);
@@ -840,6 +843,23 @@ static void alc_deinit(void) __attribute__((destructor));
 
 static void alc_init(void) __attribute__((constructor));
 static void alc_deinit(void) __attribute__((destructor));
+
+#elif defined(OPENAL_TARGET_MARMALADE)
+static void alc_init(void);
+static void alc_deinit(void);
+void alcInitLock();
+void alcDeinitLock();
+
+void alcInit( void ) {
+    alc_config_once = 0;
+    alcInitLock();
+    alc_init();
+}
+
+void alcDeinit( void ) {
+    alc_deinit();
+    alcDeinitLock();
+}
 
 #else
 #error "No global initialization available on this platform!"
@@ -1290,7 +1310,7 @@ const ALCchar *DevFmtChannelsString(enum DevFmtChannels chans)
     return "(unknown channels)";
 }
 
-extern inline ALuint FrameSizeFromDevFmt(enum DevFmtChannels chans, enum DevFmtType type);
+extern ALuint FrameSizeFromDevFmt(enum DevFmtChannels chans, enum DevFmtType type);
 ALuint BytesFromDevFmt(enum DevFmtType type)
 {
     switch(type)
@@ -1409,8 +1429,8 @@ enum HrtfRequestMode {
     Hrtf_Disable = 2,
 };
 
-extern inline void LockContext(ALCcontext *context);
-extern inline void UnlockContext(ALCcontext *context);
+extern void LockContext(ALCcontext *context);
+extern void UnlockContext(ALCcontext *context);
 
 void ALCdevice_Lock(ALCdevice *device)
 {
@@ -1537,7 +1557,7 @@ void SetDefaultChannelOrder(ALCdevice *device)
     }
 }
 
-extern inline ALint GetChannelIdxByName(const ALCdevice *device, enum Channel chan);
+extern ALint GetChannelIdxByName(const ALCdevice *device, enum Channel chan);
 
 
 /* ALCcontext_DeferUpdates
@@ -1642,7 +1662,7 @@ static void alcSetError(ALCdevice *device, ALCenum errorCode)
  * done. This is used so frequency changes on the device don't cause the time
  * to jump forward or back.
  */
-static inline void UpdateClockBase(ALCdevice *device)
+static void UpdateClockBase(ALCdevice *device)
 {
     device->ClockBase += device->SamplesDone * DEVICE_CLOCK_RES / device->Frequency;
     device->SamplesDone = 0;

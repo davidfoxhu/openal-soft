@@ -18,7 +18,7 @@
  * Or go to http://www.gnu.org/copyleft/lgpl.html
  */
 
-#include "config.h"
+#include "openal_config.h"
 
 #include <math.h>
 #include <stdlib.h>
@@ -53,47 +53,47 @@ ALfloat ConeScale = 1.0f;
 /* Localized Z scalar for mono sources */
 ALfloat ZScale = 1.0f;
 
-extern inline ALfloat minf(ALfloat a, ALfloat b);
-extern inline ALfloat maxf(ALfloat a, ALfloat b);
-extern inline ALfloat clampf(ALfloat val, ALfloat min, ALfloat max);
+extern ALfloat minf(ALfloat a, ALfloat b);
+extern ALfloat maxf(ALfloat a, ALfloat b);
+extern ALfloat clampf(ALfloat val, ALfloat min, ALfloat max);
 
-extern inline ALdouble mind(ALdouble a, ALdouble b);
-extern inline ALdouble maxd(ALdouble a, ALdouble b);
-extern inline ALdouble clampd(ALdouble val, ALdouble min, ALdouble max);
+extern ALdouble mind(ALdouble a, ALdouble b);
+extern ALdouble maxd(ALdouble a, ALdouble b);
+extern ALdouble clampd(ALdouble val, ALdouble min, ALdouble max);
 
-extern inline ALuint minu(ALuint a, ALuint b);
-extern inline ALuint maxu(ALuint a, ALuint b);
-extern inline ALuint clampu(ALuint val, ALuint min, ALuint max);
+extern ALuint minu(ALuint a, ALuint b);
+extern ALuint maxu(ALuint a, ALuint b);
+extern ALuint clampu(ALuint val, ALuint min, ALuint max);
 
-extern inline ALint mini(ALint a, ALint b);
-extern inline ALint maxi(ALint a, ALint b);
-extern inline ALint clampi(ALint val, ALint min, ALint max);
+extern ALint mini(ALint a, ALint b);
+extern ALint maxi(ALint a, ALint b);
+extern ALint clampi(ALint val, ALint min, ALint max);
 
-extern inline ALint64 mini64(ALint64 a, ALint64 b);
-extern inline ALint64 maxi64(ALint64 a, ALint64 b);
-extern inline ALint64 clampi64(ALint64 val, ALint64 min, ALint64 max);
+extern ALint64 mini64(ALint64 a, ALint64 b);
+extern ALint64 maxi64(ALint64 a, ALint64 b);
+extern ALint64 clampi64(ALint64 val, ALint64 min, ALint64 max);
 
-extern inline ALuint64 minu64(ALuint64 a, ALuint64 b);
-extern inline ALuint64 maxu64(ALuint64 a, ALuint64 b);
-extern inline ALuint64 clampu64(ALuint64 val, ALuint64 min, ALuint64 max);
+extern ALuint64 minu64(ALuint64 a, ALuint64 b);
+extern ALuint64 maxu64(ALuint64 a, ALuint64 b);
+extern ALuint64 clampu64(ALuint64 val, ALuint64 min, ALuint64 max);
 
-extern inline ALfloat lerp(ALfloat val1, ALfloat val2, ALfloat mu);
-extern inline ALfloat resample_fir4(ALfloat val0, ALfloat val1, ALfloat val2, ALfloat val3, ALuint frac);
-extern inline ALfloat resample_fir8(ALfloat val0, ALfloat val1, ALfloat val2, ALfloat val3, ALfloat val4, ALfloat val5, ALfloat val6, ALfloat val7, ALuint frac);
+extern ALfloat lerp(ALfloat val1, ALfloat val2, ALfloat mu);
+extern ALfloat resample_fir4(ALfloat val0, ALfloat val1, ALfloat val2, ALfloat val3, ALuint frac);
+extern ALfloat resample_fir8(ALfloat val0, ALfloat val1, ALfloat val2, ALfloat val3, ALfloat val4, ALfloat val5, ALfloat val6, ALfloat val7, ALuint frac);
 
-extern inline void aluVectorSet(aluVector *restrict vector, ALfloat x, ALfloat y, ALfloat z, ALfloat w);
+extern void aluVectorSet(aluVector *restrict vector, ALfloat x, ALfloat y, ALfloat z, ALfloat w);
 
-extern inline void aluMatrixfSetRow(aluMatrixf *matrix, ALuint row,
+extern void aluMatrixfSetRow(aluMatrixf *matrix, ALuint row,
                                     ALfloat m0, ALfloat m1, ALfloat m2, ALfloat m3);
-extern inline void aluMatrixfSet(aluMatrixf *matrix,
+extern void aluMatrixfSet(aluMatrixf *matrix,
                                  ALfloat m00, ALfloat m01, ALfloat m02, ALfloat m03,
                                  ALfloat m10, ALfloat m11, ALfloat m12, ALfloat m13,
                                  ALfloat m20, ALfloat m21, ALfloat m22, ALfloat m23,
                                  ALfloat m30, ALfloat m31, ALfloat m32, ALfloat m33);
 
-extern inline void aluMatrixdSetRow(aluMatrixd *matrix, ALuint row,
+extern void aluMatrixdSetRow(aluMatrixd *matrix, ALuint row,
                                     ALdouble m0, ALdouble m1, ALdouble m2, ALdouble m3);
-extern inline void aluMatrixdSet(aluMatrixd *matrix,
+extern void aluMatrixdSet(aluMatrixd *matrix,
                                  ALdouble m00, ALdouble m01, ALdouble m02, ALdouble m03,
                                  ALdouble m10, ALdouble m11, ALdouble m12, ALdouble m13,
                                  ALdouble m20, ALdouble m21, ALdouble m22, ALdouble m23,
@@ -123,7 +123,7 @@ extern inline void aluMatrixdSet(aluMatrixd *matrix,
  * at various points in the code where HRTF is explicitly used or bypassed.
  */
 
-static inline HrtfMixerFunc SelectHrtfMixer(void)
+static __inline HrtfMixerFunc SelectHrtfMixer(void)
 {
 #ifdef HAVE_SSE
     if((CPUCapFlags&CPU_CAP_SSE))
@@ -138,19 +138,19 @@ static inline HrtfMixerFunc SelectHrtfMixer(void)
 }
 
 
-static inline void aluCrossproduct(const ALfloat *inVector1, const ALfloat *inVector2, ALfloat *outVector)
+static __inline void aluCrossproduct(const ALfloat *inVector1, const ALfloat *inVector2, ALfloat *outVector)
 {
     outVector[0] = inVector1[1]*inVector2[2] - inVector1[2]*inVector2[1];
     outVector[1] = inVector1[2]*inVector2[0] - inVector1[0]*inVector2[2];
     outVector[2] = inVector1[0]*inVector2[1] - inVector1[1]*inVector2[0];
 }
 
-static inline ALfloat aluDotproduct(const aluVector *vec1, const aluVector *vec2)
+static __inline ALfloat aluDotproduct(const aluVector *vec1, const aluVector *vec2)
 {
     return vec1->v[0]*vec2->v[0] + vec1->v[1]*vec2->v[1] + vec1->v[2]*vec2->v[2];
 }
 
-static inline ALfloat aluNormalize(ALfloat *vec)
+static __inline ALfloat aluNormalize(ALfloat *vec)
 {
     ALfloat length = sqrtf(vec[0]*vec[0] + vec[1]*vec[1] + vec[2]*vec[2]);
     if(length > 0.0f)
@@ -164,14 +164,14 @@ static inline ALfloat aluNormalize(ALfloat *vec)
 }
 
 
-static inline void aluCrossproductd(const ALdouble *inVector1, const ALdouble *inVector2, ALdouble *outVector)
+static __inline void aluCrossproductd(const ALdouble *inVector1, const ALdouble *inVector2, ALdouble *outVector)
 {
     outVector[0] = inVector1[1]*inVector2[2] - inVector1[2]*inVector2[1];
     outVector[1] = inVector1[2]*inVector2[0] - inVector1[0]*inVector2[2];
     outVector[2] = inVector1[0]*inVector2[1] - inVector1[1]*inVector2[0];
 }
 
-static inline ALdouble aluNormalized(ALdouble *vec)
+static __inline ALdouble aluNormalized(ALdouble *vec)
 {
     ALdouble length = sqrt(vec[0]*vec[0] + vec[1]*vec[1] + vec[2]*vec[2]);
     if(length > 0.0)
@@ -184,7 +184,7 @@ static inline ALdouble aluNormalized(ALdouble *vec)
     return length;
 }
 
-static inline ALvoid aluMatrixdFloat3(ALfloat *vec, ALfloat w, const aluMatrixd *mtx)
+static __inline ALvoid aluMatrixdFloat3(ALfloat *vec, ALfloat w, const aluMatrixd *mtx)
 {
     ALdouble v[4] = { vec[0], vec[1], vec[2], w };
 
@@ -193,7 +193,7 @@ static inline ALvoid aluMatrixdFloat3(ALfloat *vec, ALfloat w, const aluMatrixd 
     vec[2] = (ALfloat)(v[0]*mtx->m[0][2] + v[1]*mtx->m[1][2] + v[2]*mtx->m[2][2] + v[3]*mtx->m[3][2]);
 }
 
-static inline ALvoid aluMatrixdDouble3(ALdouble *vec, ALdouble w, const aluMatrixd *mtx)
+static __inline ALvoid aluMatrixdDouble3(ALdouble *vec, ALdouble w, const aluMatrixd *mtx)
 {
     ALdouble v[4] = { vec[0], vec[1], vec[2], w };
 
@@ -202,7 +202,7 @@ static inline ALvoid aluMatrixdDouble3(ALdouble *vec, ALdouble w, const aluMatri
     vec[2] = v[0]*mtx->m[0][2] + v[1]*mtx->m[1][2] + v[2]*mtx->m[2][2] + v[3]*mtx->m[3][2];
 }
 
-static inline aluVector aluMatrixdVector(const aluMatrixd *mtx, const aluVector *vec)
+static __inline aluVector aluMatrixdVector(const aluMatrixd *mtx, const aluVector *vec)
 {
     aluVector v;
     v.v[0] = (ALfloat)(vec->v[0]*mtx->m[0][0] + vec->v[1]*mtx->m[1][0] + vec->v[2]*mtx->m[2][0] + vec->v[3]*mtx->m[3][0]);
@@ -1337,33 +1337,33 @@ void UpdateContextSources(ALCcontext *ctx)
 
 /* Specialized function to clamp to [-1, +1] with only one branch. This also
  * converts NaN to 0. */
-static inline ALfloat aluClampf(ALfloat val)
+static __inline ALfloat aluClampf(ALfloat val)
 {
     if(fabsf(val) <= 1.0f) return val;
     return (ALfloat)((0.0f < val) - (val < 0.0f));
 }
 
-static inline ALfloat aluF2F(ALfloat val)
+static __inline ALfloat aluF2F(ALfloat val)
 { return val; }
 
-static inline ALint aluF2I(ALfloat val)
+static __inline ALint aluF2I(ALfloat val)
 {
     /* Floats only have a 24-bit mantissa, so [-16777215, +16777215] is the max
      * integer range normalized floats can be safely converted to.
      */
     return fastf2i(aluClampf(val)*16777215.0f)<<7;
 }
-static inline ALuint aluF2UI(ALfloat val)
+static __inline ALuint aluF2UI(ALfloat val)
 { return aluF2I(val)+2147483648u; }
 
-static inline ALshort aluF2S(ALfloat val)
+static __inline ALshort aluF2S(ALfloat val)
 { return fastf2i(aluClampf(val)*32767.0f); }
-static inline ALushort aluF2US(ALfloat val)
+static __inline ALushort aluF2US(ALfloat val)
 { return aluF2S(val)+32768; }
 
-static inline ALbyte aluF2B(ALfloat val)
+static __inline ALbyte aluF2B(ALfloat val)
 { return fastf2i(aluClampf(val)*127.0f); }
-static inline ALubyte aluF2UB(ALfloat val)
+static __inline ALubyte aluF2UB(ALfloat val)
 { return aluF2B(val)+128; }
 
 #define DECL_TEMPLATE(T, func)                                                \

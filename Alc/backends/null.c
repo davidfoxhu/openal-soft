@@ -18,12 +18,14 @@
  * Or go to http://www.gnu.org/copyleft/lgpl.html
  */
 
-#include "config.h"
+#include "openal_config.h"
 
 #include <stdlib.h>
+#ifndef OPENAL_TARGET_MARMALADE
 #ifdef HAVE_WINDOWS_H
 #include <windows.h>
 #endif
+#endif //OPENAL_TARGET_MARMALADE
 
 #include "alMain.h"
 #include "alu.h"
@@ -43,7 +45,7 @@ typedef struct ALCnullBackend {
 static int ALCnullBackend_mixerProc(void *ptr);
 
 static void ALCnullBackend_Construct(ALCnullBackend *self, ALCdevice *device);
-static DECLARE_FORWARD(ALCnullBackend, ALCbackend, void, Destruct)
+static DECLARE_FORWARD_RETURN_VOID(ALCnullBackend, ALCbackend, Destruct)
 static ALCenum ALCnullBackend_open(ALCnullBackend *self, const ALCchar *name);
 static void ALCnullBackend_close(ALCnullBackend *self);
 static ALCboolean ALCnullBackend_reset(ALCnullBackend *self);
@@ -52,8 +54,8 @@ static void ALCnullBackend_stop(ALCnullBackend *self);
 static DECLARE_FORWARD2(ALCnullBackend, ALCbackend, ALCenum, captureSamples, void*, ALCuint)
 static DECLARE_FORWARD(ALCnullBackend, ALCbackend, ALCuint, availableSamples)
 static DECLARE_FORWARD(ALCnullBackend, ALCbackend, ALint64, getLatency)
-static DECLARE_FORWARD(ALCnullBackend, ALCbackend, void, lock)
-static DECLARE_FORWARD(ALCnullBackend, ALCbackend, void, unlock)
+static DECLARE_FORWARD_RETURN_VOID(ALCnullBackend, ALCbackend, lock)
+static DECLARE_FORWARD_RETURN_VOID(ALCnullBackend, ALCbackend, unlock)
 DECLARE_DEFAULT_ALLOCATORS(ALCnullBackend)
 
 DEFINE_ALCBACKEND_VTABLE(ALCnullBackend);
@@ -171,7 +173,7 @@ typedef struct ALCnullBackendFactory {
 ALCbackendFactory *ALCnullBackendFactory_getFactory(void);
 
 static ALCboolean ALCnullBackendFactory_init(ALCnullBackendFactory *self);
-static DECLARE_FORWARD(ALCnullBackendFactory, ALCbackendFactory, void, deinit)
+static DECLARE_FORWARD_RETURN_VOID(ALCnullBackendFactory, ALCbackendFactory, deinit)
 static ALCboolean ALCnullBackendFactory_querySupport(ALCnullBackendFactory *self, ALCbackend_Type type);
 static void ALCnullBackendFactory_probe(ALCnullBackendFactory *self, enum DevProbe type);
 static ALCbackend* ALCnullBackendFactory_createBackend(ALCnullBackendFactory *self, ALCdevice *device, ALCbackend_Type type);

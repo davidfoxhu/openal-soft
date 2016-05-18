@@ -26,7 +26,7 @@
 #endif
 #endif
 
-#include "config.h"
+#include "openal_config.h"
 
 #include <stdlib.h>
 #include <stdio.h>
@@ -345,6 +345,36 @@ void ReadALConfig(void)
         }
         al_string_deinit(&filepath);
     }
+}
+
+#elif defined OPENAL_TARGET_MARMALADE
+static const char* g_szConfigPath = "alsoft.ini";
+ALC_API void alcSetConfigPath(const char* szConfigPath)
+{
+    g_szConfigPath = szConfigPath;
+}
+
+const char* g_szHRTFPath = "openal/hrtf";
+ALC_API void alcSetHRTFDirPath(const char* szHRTFPath)
+{
+    g_szHRTFPath = szHRTFPath;
+}
+
+void ReadALConfig(void)
+{
+    FILE *f = NULL;
+
+    al_string filepath = AL_STRING_INIT_STATIC();
+    al_string_append_cstr(&filepath, g_szConfigPath);
+
+    TRACE("Loading config %s...\n", al_string_get_cstr(filepath));
+    f = al_fopen(al_string_get_cstr(filepath), "rt");
+    if(f)
+    {
+        LoadConfigFromFile(f);
+        fclose(f);
+    }
+    al_string_deinit(&filepath);
 }
 #else
 void ReadALConfig(void)

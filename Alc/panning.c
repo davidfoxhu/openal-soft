@@ -18,7 +18,7 @@
  * Or go to http://www.gnu.org/copyleft/lgpl.html
  */
 
-#include "config.h"
+#include "openal_config.h"
 
 #include <math.h>
 #include <stdlib.h>
@@ -164,7 +164,7 @@ void ComputeBFormatGains(const ALCdevice *device, const ALfloat mtx[4], ALfloat 
 }
 
 
-DECL_CONST static inline const char *GetLabelFromChannel(enum Channel channel)
+DECL_CONST static __inline const char *GetLabelFromChannel(enum Channel channel)
 {
     switch(channel)
     {

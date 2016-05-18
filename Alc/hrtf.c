@@ -18,7 +18,7 @@
  * Or go to http://www.gnu.org/copyleft/lgpl.html
  */
 
-#include "config.h"
+#include "openal_config.h"
 
 #include <stdlib.h>
 #include <ctype.h>
@@ -817,10 +817,11 @@ error:
     al_string_deinit(&entry.filename);
 }
 
+extern const char* g_szHRTFPath;
 vector_HrtfEntry EnumerateHrtf(const_al_string devname)
 {
     vector_HrtfEntry list = VECTOR_INIT_STATIC();
-    const char *fnamelist = "%s.mhr";
+    const char *fnamelist = ".mhr";
 
     ConfigValueStr(al_string_get_cstr(devname), NULL, "hrtf_tables", &fnamelist);
     while(fnamelist && *fnamelist)
@@ -846,7 +847,7 @@ vector_HrtfEntry EnumerateHrtf(const_al_string devname)
 
                 al_string_append_range(&fname, fnamelist, end);
 
-                flist = SearchDataFiles(al_string_get_cstr(fname), "openal/hrtf");
+                flist = SearchDataFiles(al_string_get_cstr(fname), g_szHRTFPath);
                 VECTOR_FOR_EACH_PARAMS(al_string, flist, AddFileEntry, &list);
                 VECTOR_DEINIT(flist);
 

@@ -18,7 +18,7 @@
  * Or go to http://www.gnu.org/copyleft/lgpl.html
  */
 
-#include "config.h"
+#include "openal_config.h"
 
 #include <stdlib.h>
 
@@ -33,7 +33,7 @@ typedef struct ALCloopback {
 } ALCloopback;
 
 static void ALCloopback_Construct(ALCloopback *self, ALCdevice *device);
-static DECLARE_FORWARD(ALCloopback, ALCbackend, void, Destruct)
+static DECLARE_FORWARD_RETURN_VOID(ALCloopback, ALCbackend, Destruct)
 static ALCenum ALCloopback_open(ALCloopback *self, const ALCchar *name);
 static void ALCloopback_close(ALCloopback *self);
 static ALCboolean ALCloopback_reset(ALCloopback *self);
@@ -42,8 +42,8 @@ static void ALCloopback_stop(ALCloopback *self);
 static DECLARE_FORWARD2(ALCloopback, ALCbackend, ALCenum, captureSamples, void*, ALCuint)
 static DECLARE_FORWARD(ALCloopback, ALCbackend, ALCuint, availableSamples)
 static DECLARE_FORWARD(ALCloopback, ALCbackend, ALint64, getLatency)
-static DECLARE_FORWARD(ALCloopback, ALCbackend, void, lock)
-static DECLARE_FORWARD(ALCloopback, ALCbackend, void, unlock)
+static DECLARE_FORWARD_RETURN_VOID(ALCloopback, ALCbackend, lock)
+static DECLARE_FORWARD_RETURN_VOID(ALCloopback, ALCbackend, unlock)
 DECLARE_DEFAULT_ALLOCATORS(ALCloopback)
 DEFINE_ALCBACKEND_VTABLE(ALCloopback);
 
@@ -90,7 +90,7 @@ typedef struct ALCloopbackFactory {
 
 ALCbackendFactory *ALCloopbackFactory_getFactory(void);
 static ALCboolean ALCloopbackFactory_init(ALCloopbackFactory *self);
-static DECLARE_FORWARD(ALCloopbackFactory, ALCbackendFactory, void, deinit)
+static DECLARE_FORWARD_RETURN_VOID(ALCloopbackFactory, ALCbackendFactory, deinit)
 static ALCboolean ALCloopbackFactory_querySupport(ALCloopbackFactory *self, ALCbackend_Type type);
 static void ALCloopbackFactory_probe(ALCloopbackFactory *self, enum DevProbe type);
 static ALCbackend* ALCloopbackFactory_createBackend(ALCloopbackFactory *self, ALCdevice *device, ALCbackend_Type type);

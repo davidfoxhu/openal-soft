@@ -138,6 +138,10 @@ static const union {
 rettype T1##_##func(T1 *obj)                                                  \
 { return T2##_##func(STATIC_CAST(T2, obj)); }
 
+#define DECLARE_FORWARD_RETURN_VOID(T1, T2, func)                             \
+void T1##_##func(T1 *obj)                                                     \
+{ T2##_##func(STATIC_CAST(T2, obj)); }
+
 #define DECLARE_FORWARD1(T1, T2, rettype, func, argtype1)                     \
 rettype T1##_##func(T1 *obj, argtype1 a)                                      \
 { return T2##_##func(STATIC_CAST(T2, obj), a); }
@@ -161,21 +165,41 @@ rettype T1##_##func(T1 *obj, argtype1 a, argtype2 b, argtype3 c)              \
 static rettype T1##_##T2##_##func(T2 *obj)                                    \
 { return T1##_##func(STATIC_UPCAST(T1, T2, obj)); }
 
+#define DECLARE_THUNK_VOID(T1, T2, func)                                      \
+static void T1##_##T2##_##func(T2 *obj)                                       \
+{ T1##_##func(STATIC_UPCAST(T1, T2, obj)); }
+
 #define DECLARE_THUNK1(T1, T2, rettype, func, argtype1)                       \
 static rettype T1##_##T2##_##func(T2 *obj, argtype1 a)                        \
 { return T1##_##func(STATIC_UPCAST(T1, T2, obj), a); }
+
+#define DECLARE_THUNK1_VOID(T1, T2, func, argtype1)                           \
+static void T1##_##T2##_##func(T2 *obj, argtype1 a)                           \
+{ T1##_##func(STATIC_UPCAST(T1, T2, obj), a); }
 
 #define DECLARE_THUNK2(T1, T2, rettype, func, argtype1, argtype2)             \
 static rettype T1##_##T2##_##func(T2 *obj, argtype1 a, argtype2 b)            \
 { return T1##_##func(STATIC_UPCAST(T1, T2, obj), a, b); }
 
+#define DECLARE_THUNK2_VOID(T1, T2, func, argtype1, argtype2)                 \
+static void T1##_##T2##_##func(T2 *obj, argtype1 a, argtype2 b)               \
+{ T1##_##func(STATIC_UPCAST(T1, T2, obj), a, b); }
+
 #define DECLARE_THUNK3(T1, T2, rettype, func, argtype1, argtype2, argtype3)   \
 static rettype T1##_##T2##_##func(T2 *obj, argtype1 a, argtype2 b, argtype3 c) \
 { return T1##_##func(STATIC_UPCAST(T1, T2, obj), a, b, c); }
 
+#define DECLARE_THUNK3_VOID(T1, T2, func, argtype1, argtype2, argtype3)   \
+static void T1##_##T2##_##func(T2 *obj, argtype1 a, argtype2 b, argtype3 c) \
+{ T1##_##func(STATIC_UPCAST(T1, T2, obj), a, b, c); }
+
 #define DECLARE_THUNK4(T1, T2, rettype, func, argtype1, argtype2, argtype3, argtype4) \
 static rettype T1##_##T2##_##func(T2 *obj, argtype1 a, argtype2 b, argtype3 c, argtype4 d) \
 { return T1##_##func(STATIC_UPCAST(T1, T2, obj), a, b, c, d); }
+
+#define DECLARE_THUNK4_VOID(T1, T2, func, argtype1, argtype2, argtype3, argtype4) \
+static void T1##_##T2##_##func(T2 *obj, argtype1 a, argtype2 b, argtype3 c, argtype4 d) \
+{ T1##_##func(STATIC_UPCAST(T1, T2, obj), a, b, c, d); }
 
 #define DECLARE_DEFAULT_ALLOCATORS(T)                                         \
 static void* T##_New(size_t size) { return al_malloc(16, size); }             \
@@ -222,7 +246,7 @@ struct Hrtf;
 
 
 /* Find the next power-of-2 for non-power-of-2 numbers. */
-inline ALuint NextPowerOf2(ALuint value)
+static __inline ALuint NextPowerOf2(ALuint value)
 {
     if(value > 0)
     {
@@ -238,7 +262,7 @@ inline ALuint NextPowerOf2(ALuint value)
 
 /* Fast float-to-int conversion. Assumes the FPU is already in round-to-zero
  * mode. */
-inline ALint fastf2i(ALfloat f)
+static __inline ALint fastf2i(ALfloat f)
 {
 #ifdef HAVE_LRINTF
     return lrintf(f);
@@ -254,7 +278,7 @@ inline ALint fastf2i(ALfloat f)
 
 /* Fast float-to-uint conversion. Assumes the FPU is already in round-to-zero
  * mode. */
-inline ALuint fastf2u(ALfloat f)
+static __inline ALuint fastf2u(ALfloat f)
 { return fastf2i(f); }
 
 
@@ -290,6 +314,9 @@ void alc_opensl_probe(enum DevProbe type);
 ALCboolean alc_qsa_init(BackendFuncs *func_list);
 void alc_qsa_deinit(void);
 void alc_qsa_probe(enum DevProbe type);
+ALCboolean alc_s3e_init(BackendFuncs *func_list);
+void alc_s3e_deinit(void);
+void alc_s3e_probe(enum DevProbe);
 
 struct ALCbackend;
 
@@ -357,7 +384,7 @@ enum DevFmtChannels {
 
 ALuint BytesFromDevFmt(enum DevFmtType type) DECL_CONST;
 ALuint ChannelsFromDevFmt(enum DevFmtChannels chans) DECL_CONST;
-inline ALuint FrameSizeFromDevFmt(enum DevFmtChannels chans, enum DevFmtType type)
+static __inline ALuint FrameSizeFromDevFmt(enum DevFmtChannels chans, enum DevFmtType type)
 {
     return ChannelsFromDevFmt(chans) * BytesFromDevFmt(type);
 }
@@ -424,25 +451,25 @@ struct ALCdevice_struct
     ALCboolean Connected;
     enum DeviceType Type;
 
-    ALuint       Frequency;
-    ALuint       UpdateSize;
-    ALuint       NumUpdates;
+    ALuint Frequency;
+    ALuint UpdateSize;
+    ALuint NumUpdates;
     enum DevFmtChannels FmtChans;
     enum DevFmtType     FmtType;
-    ALboolean    IsHeadphones;
+    ALboolean IsHeadphones;
 
     al_string DeviceName;
 
     ATOMIC(ALCenum) LastError;
 
     // Maximum number of sources that can be created
-    ALuint       MaxNoOfSources;
+    ALuint MaxNoOfSources;
     // Maximum number of slots that can be created
-    ALuint       AuxiliaryEffectSlotMax;
+    ALuint AuxiliaryEffectSlotMax;
 
-    ALCuint      NumMonoSources;
-    ALCuint      NumStereoSources;
-    ALuint       NumAuxSends;
+    ALCuint NumMonoSources;
+    ALCuint NumStereoSources;
+    ALuint  NumAuxSends;
 
     // Map of Buffers for this device
     UIntMap BufferMap;
@@ -505,7 +532,7 @@ struct ALCdevice_struct
     ALCdevice *volatile next;
 
     /* Memory space used by the default slot (Playback devices only) */
-    alignas(16) ALCbyte _slot_mem[];
+    ALCbyte _slot_mem[];
 };
 
 // Frequency was requested by the app or config file
@@ -583,17 +610,16 @@ void ALCdevice_Unlock(ALCdevice *device);
 void ALCcontext_DeferUpdates(ALCcontext *context);
 void ALCcontext_ProcessUpdates(ALCcontext *context);
 
-inline void LockContext(ALCcontext *context)
+static __inline void LockContext(ALCcontext *context)
 { ALCdevice_Lock(context->Device); }
 
-inline void UnlockContext(ALCcontext *context)
+static __inline void UnlockContext(ALCcontext *context)
 { ALCdevice_Unlock(context->Device); }
 
 
 void *al_malloc(size_t alignment, size_t size);
 void *al_calloc(size_t alignment, size_t size);
 void al_free(void *ptr);
-
 
 typedef struct {
 #ifdef HAVE_FENV_H
@@ -660,7 +686,7 @@ const ALCchar *DevFmtChannelsString(enum DevFmtChannels chans) DECL_CONST;
  * Returns the device's channel index given a channel name (e.g. FrontCenter),
  * or -1 if it doesn't exist.
  */
-inline ALint GetChannelIdxByName(const ALCdevice *device, enum Channel chan)
+static __inline ALint GetChannelIdxByName(const ALCdevice *device, enum Channel chan)
 {
     ALint i = 0;
     for(i = 0;i < MAX_OUTPUT_CHANNELS;i++)
@@ -674,7 +700,10 @@ inline ALint GetChannelIdxByName(const ALCdevice *device, enum Channel chan)
 
 extern FILE *LogFile;
 
-#if defined(__GNUC__) && !defined(_WIN32) && !defined(IN_IDE_PARSER)
+#if defined OPENAL_TARGET_MARMALADE
+#include <s3eDebug.h>
+#define AL_PRINT s3eDebugTracePrintf
+#elif defined(__GNUC__) && !defined(_WIN32) && !defined(IN_IDE_PARSER)
 #define AL_PRINT(T, MSG, ...) fprintf(LogFile, "AL lib: %s %s: "MSG, T, __FUNCTION__ , ## __VA_ARGS__)
 #else
 void al_print(const char *type, const char *func, const char *fmt, ...) DECL_FORMAT(printf, 3,4);
@@ -692,22 +721,22 @@ extern enum LogLevel LogLevel;
 
 #define TRACEREF(...) do {                                                    \
     if(LogLevel >= LogRef)                                                    \
-        AL_PRINT("(--)", __VA_ARGS__);                                        \
+        AL_PRINT(__VA_ARGS__);                                                \
 } while(0)
 
 #define TRACE(...) do {                                                       \
     if(LogLevel >= LogTrace)                                                  \
-        AL_PRINT("(II)", __VA_ARGS__);                                        \
+        AL_PRINT(__VA_ARGS__);                                                \
 } while(0)
 
 #define WARN(...) do {                                                        \
     if(LogLevel >= LogWarning)                                                \
-        AL_PRINT("(WW)", __VA_ARGS__);                                        \
+        AL_PRINT(__VA_ARGS__);                                                \
 } while(0)
 
 #define ERR(...) do {                                                         \
     if(LogLevel >= LogError)                                                  \
-        AL_PRINT("(EE)", __VA_ARGS__);                                        \
+        AL_PRINT(__VA_ARGS__);                                               \
 } while(0)
 
 

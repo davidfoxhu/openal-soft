@@ -18,7 +18,7 @@
  * Or go to http://www.gnu.org/copyleft/lgpl.html
  */
 
-#include "config.h"
+#include "openal_config.h"
 
 #include <math.h>
 #include <stdlib.h>
@@ -143,7 +143,7 @@ static ALvoid ALchorusState_update(ALchorusState *state, ALCdevice *Device, cons
     }
 }
 
-static inline void Triangle(ALint *delay_left, ALint *delay_right, ALuint offset, const ALchorusState *state)
+static __inline void Triangle(ALint *delay_left, ALint *delay_right, ALuint offset, const ALchorusState *state)
 {
     ALfloat lfo_value;
 
@@ -157,7 +157,7 @@ static inline void Triangle(ALint *delay_left, ALint *delay_right, ALuint offset
     *delay_right = fastf2i(lfo_value) + state->delay;
 }
 
-static inline void Sinusoid(ALint *delay_left, ALint *delay_right, ALuint offset, const ALchorusState *state)
+static __inline void Sinusoid(ALint *delay_left, ALint *delay_right, ALuint offset, const ALchorusState *state)
 {
     ALfloat lfo_value;
 

@@ -18,7 +18,7 @@
  * Or go to http://www.gnu.org/copyleft/lgpl.html
  */
 
-#include "config.h"
+#include "openal_config.h"
 
 #include <stdlib.h>
 
@@ -29,13 +29,13 @@
 #include "alError.h"
 
 
-extern inline struct ALfilter *LookupFilter(ALCdevice *device, ALuint id);
-extern inline struct ALfilter *RemoveFilter(ALCdevice *device, ALuint id);
-extern inline void ALfilterState_clear(ALfilterState *filter);
-extern inline void ALfilterState_processPassthru(ALfilterState *filter, const ALfloat *src, ALuint numsamples);
-extern inline ALfloat ALfilterState_processSingle(ALfilterState *filter, ALfloat sample);
-extern inline ALfloat calc_rcpQ_from_slope(ALfloat gain, ALfloat slope);
-extern inline ALfloat calc_rcpQ_from_bandwidth(ALfloat freq_mult, ALfloat bandwidth);
+extern struct ALfilter *LookupFilter(ALCdevice *device, ALuint id);
+extern struct ALfilter *RemoveFilter(ALCdevice *device, ALuint id);
+extern void ALfilterState_clear(ALfilterState *filter);
+extern void ALfilterState_processPassthru(ALfilterState *filter, const ALfloat *src, ALuint numsamples);
+extern ALfloat ALfilterState_processSingle(ALfilterState *filter, ALfloat sample);
+extern ALfloat calc_rcpQ_from_slope(ALfloat gain, ALfloat slope);
+extern ALfloat calc_rcpQ_from_bandwidth(ALfloat freq_mult, ALfloat bandwidth);
 
 static void InitFilterParams(ALfilter *filter, ALenum type);
 

@@ -38,7 +38,7 @@ enum UserFmtChannels {
 
 ALuint BytesFromUserFmt(enum UserFmtType type) DECL_CONST;
 ALuint ChannelsFromUserFmt(enum UserFmtChannels chans) DECL_CONST;
-inline ALuint FrameSizeFromUserFmt(enum UserFmtChannels chans, enum UserFmtType type)
+static __inline ALuint FrameSizeFromUserFmt(enum UserFmtChannels chans, enum UserFmtType type)
 {
     return ChannelsFromUserFmt(chans) * BytesFromUserFmt(type);
 }
@@ -65,7 +65,7 @@ enum FmtChannels {
 
 ALuint BytesFromFmt(enum FmtType type) DECL_CONST;
 ALuint ChannelsFromFmt(enum FmtChannels chans) DECL_CONST;
-inline ALuint FrameSizeFromFmt(enum FmtChannels chans, enum FmtType type)
+static __inline ALuint FrameSizeFromFmt(enum FmtChannels chans, enum FmtType type)
 {
     return ChannelsFromFmt(chans) * BytesFromFmt(type);
 }
@@ -106,9 +106,9 @@ void DeleteBuffer(ALCdevice *device, ALbuffer *buffer);
 
 ALenum LoadData(ALbuffer *buffer, ALuint freq, ALenum NewFormat, ALsizei frames, enum UserFmtChannels SrcChannels, enum UserFmtType SrcType, const ALvoid *data, ALsizei align, ALboolean storesrc);
 
-inline struct ALbuffer *LookupBuffer(ALCdevice *device, ALuint id)
+static __inline struct ALbuffer *LookupBuffer(ALCdevice *device, ALuint id)
 { return (struct ALbuffer*)LookupUIntMapKey(&device->BufferMap, id); }
-inline struct ALbuffer *RemoveBuffer(ALCdevice *device, ALuint id)
+static __inline struct ALbuffer *RemoveBuffer(ALCdevice *device, ALuint id)
 { return (struct ALbuffer*)RemoveUIntMapKey(&device->BufferMap, id); }
 
 ALvoid ReleaseALBuffers(ALCdevice *device);

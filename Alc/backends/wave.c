@@ -18,7 +18,7 @@
  * Or go to http://www.gnu.org/copyleft/lgpl.html
  */
 
-#include "config.h"
+#include "openal_config.h"
 
 #include <stdlib.h>
 #include <stdio.h>
@@ -83,7 +83,7 @@ typedef struct ALCwaveBackend {
 static int ALCwaveBackend_mixerProc(void *ptr);
 
 static void ALCwaveBackend_Construct(ALCwaveBackend *self, ALCdevice *device);
-static DECLARE_FORWARD(ALCwaveBackend, ALCbackend, void, Destruct)
+static DECLARE_FORWARD_RETURN_VOID(ALCwaveBackend, ALCbackend, Destruct)
 static ALCenum ALCwaveBackend_open(ALCwaveBackend *self, const ALCchar *name);
 static void ALCwaveBackend_close(ALCwaveBackend *self);
 static ALCboolean ALCwaveBackend_reset(ALCwaveBackend *self);
@@ -92,8 +92,8 @@ static void ALCwaveBackend_stop(ALCwaveBackend *self);
 static DECLARE_FORWARD2(ALCwaveBackend, ALCbackend, ALCenum, captureSamples, void*, ALCuint)
 static DECLARE_FORWARD(ALCwaveBackend, ALCbackend, ALCuint, availableSamples)
 static DECLARE_FORWARD(ALCwaveBackend, ALCbackend, ALint64, getLatency)
-static DECLARE_FORWARD(ALCwaveBackend, ALCbackend, void, lock)
-static DECLARE_FORWARD(ALCwaveBackend, ALCbackend, void, unlock)
+static DECLARE_FORWARD_RETURN_VOID(ALCwaveBackend, ALCbackend, lock)
+static DECLARE_FORWARD_RETURN_VOID(ALCwaveBackend, ALCbackend, unlock)
 DECLARE_DEFAULT_ALLOCATORS(ALCwaveBackend)
 
 DEFINE_ALCBACKEND_VTABLE(ALCwaveBackend);
@@ -388,7 +388,7 @@ typedef struct ALCwaveBackendFactory {
 ALCbackendFactory *ALCwaveBackendFactory_getFactory(void);
 
 static ALCboolean ALCwaveBackendFactory_init(ALCwaveBackendFactory *self);
-static DECLARE_FORWARD(ALCwaveBackendFactory, ALCbackendFactory, void, deinit)
+static DECLARE_FORWARD_RETURN_VOID(ALCwaveBackendFactory, ALCbackendFactory, deinit)
 static ALCboolean ALCwaveBackendFactory_querySupport(ALCwaveBackendFactory *self, ALCbackend_Type type);
 static void ALCwaveBackendFactory_probe(ALCwaveBackendFactory *self, enum DevProbe type);
 static ALCbackend* ALCwaveBackendFactory_createBackend(ALCwaveBackendFactory *self, ALCdevice *device, ALCbackend_Type type);

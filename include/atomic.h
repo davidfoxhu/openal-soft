@@ -342,8 +342,10 @@ int _al_invalid_atomic_size(); /* not defined */
 #define ATOMIC_COMPARE_EXCHANGE_WEAK ATOMIC_COMPARE_EXCHANGE_STRONG
 #endif
 
-
+#ifndef OPENAL_TARGET_MARMALADE
 typedef unsigned int uint;
+#endif //OPENAL_TARGET_MARMALADE
+
 typedef ATOMIC(uint) RefCount;
 
 static __inline void InitRef(RefCount *ptr, uint value)

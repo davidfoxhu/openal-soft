@@ -112,6 +112,9 @@ typedef ALuint64SOFT ALuint64;
 #endif
 #endif
 
+#ifdef OPENAL_TARGET_MARMALADE
+#include <s3eThread.h>
+#endif //OPENAL_TARGET_MARMALADE
 
 static const union {
     ALuint u;
@@ -511,6 +514,9 @@ struct ALCdevice_struct
 
     /* Dry path buffer mix. */
     alignas(16) ALfloat (*DryBuffer)[BUFFERSIZE];
+#ifdef OPENAL_TARGET_MARMALADE
+    s3eThreadLock* DryBufferLock;
+#endif //OPENAL_TARGET_MARMALADE
 
     /* Running count of the mixer invocations, in 31.1 fixed point. This
      * actually increments *twice* when mixing, first at the start and then at

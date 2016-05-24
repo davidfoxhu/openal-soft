@@ -1401,6 +1401,16 @@ ALvoid aluMixData(ALCdevice *device, ALvoid *buffer, ALsizei size)
     FPUCtl oldMode;
     ALuint i, c;
 
+#ifdef OPENAL_TARGET_MARMALADE
+    s3eThreadLockAcquire(device->DryBufferLock, -1);
+    while (device->DryBuffer == NULL)
+    {
+        s3eThreadLockRelease(device->DryBufferLock);
+        sleep(0);
+        s3eThreadLockAcquire(device->DryBufferLock, -1);
+    }
+#endif //OPENAL_TARGET_MARMALADE
+
     SetMixerFPUMode(&oldMode);
 
     while(size > 0)
@@ -1553,6 +1563,10 @@ ALvoid aluMixData(ALCdevice *device, ALvoid *buffer, ALsizei size)
     }
 
     RestoreFPUMode(&oldMode);
+
+#ifdef OPENAL_TARGET_MARMALADE
+    s3eThreadLockRelease(device->DryBufferLock);
+#endif //OPENAL_TARGET_MARMALADE
 }
 
 

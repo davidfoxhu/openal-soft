@@ -1866,8 +1866,14 @@ static ALCenum UpdateDeviceParams(ALCdevice *device, const ALCint *attrList)
     if((device->Flags&DEVICE_RUNNING))
         return ALC_NO_ERROR;
 
+#ifdef OPENAL_TARGET_MARMALADE
+    s3eThreadLockAcquire(device->DryBufferLock, -1);
+#endif //OPENAL_TARGET_MARMALADE
     al_free(device->DryBuffer);
     device->DryBuffer = NULL;
+#ifdef OPENAL_TARGET_MARMALADE
+    s3eThreadLockRelease(device->DryBufferLock);
+#endif //OPENAL_TARGET_MARMALADE
 
     UpdateClockBase(device);
 
@@ -2121,7 +2127,15 @@ static ALCenum UpdateDeviceParams(ALCdevice *device, const ALCint *attrList)
 
     /* With HRTF, allocate two extra channels for the post-filter output. */
     size = sizeof(device->DryBuffer[0]) * (device->NumChannels + (device->Hrtf ? 2 : 0));
+
+#ifdef OPENAL_TARGET_MARMALADE
+    s3eThreadLockAcquire(device->DryBufferLock, -1);
+#endif //OPENAL_TARGET_MARMALADE
     device->DryBuffer = al_calloc(16, size);
+#ifdef OPENAL_TARGET_MARMALADE
+    s3eThreadLockRelease(device->DryBufferLock);
+#endif //OPENAL_TARGET_MARMALADE
+
     if(!device->DryBuffer)
     {
         ERR("Failed to allocate "SZFMT" bytes for mix buffer\n", size);
@@ -2268,8 +2282,17 @@ static ALCvoid FreeDevice(ALCdevice *device)
 
     AL_STRING_DEINIT(device->DeviceName);
 
+#ifdef OPENAL_TARGET_MARMALADE
+    s3eThreadLockAcquire(device->DryBufferLock, -1);
+#endif //OPENAL_TARGET_MARMALADE
     al_free(device->DryBuffer);
     device->DryBuffer = NULL;
+#ifdef OPENAL_TARGET_MARMALADE
+    s3eThreadLockRelease(device->DryBufferLock);
+
+    s3eThreadLockDestroy(device->DryBufferLock);
+    device->DryBufferLock = NULL;
+#endif //OPENAL_TARGET_MARMALADE
 
     al_free(device);
 }
@@ -3369,6 +3392,9 @@ ALC_API ALCdevice* ALC_APIENTRY alcOpenDevice(const ALCchar *deviceName)
     device->Hrtf_Mode = DisabledHrtf;
     AL_STRING_INIT(device->DeviceName);
     device->DryBuffer = NULL;
+#ifdef OPENAL_TARGET_MARMALADE
+    device->DryBufferLock = s3eThreadRecursiveLockCreate();
+#endif //OPENAL_TARGET_MARMALADE
 
     ATOMIC_INIT(&device->ContextList, NULL);
 
